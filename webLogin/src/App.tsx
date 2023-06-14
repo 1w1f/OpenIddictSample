@@ -1,10 +1,10 @@
 import React from "react"
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom"
-import HomePage from './pages/HomePage'
-
+import LoginPage from './pages/LoginPage'
+import './css/index.css'
 
 const App: React.FC = () => {
-  const router = createBrowserRouter([{ path: "/", element: <Navigate to='/home' /> }, { path: '/home', element: <HomePage /> }, { path: "*", element: <>404</> }])
+  const router = createBrowserRouter([{ path: "/", element: <Navigate to='/login' /> }, { path: '/login', element: <LoginPage /> }, { path: "*", element: <>404</> }])
 
 
   return (
