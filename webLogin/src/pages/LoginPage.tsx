@@ -1,17 +1,55 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import { Input, Button, Label, InputProps } from "@fluentui/react-components"
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { NavigateFunction, useNavigate, useSearchParams } from "react-router-dom";
+import { UserManager } from "oidc-client";
 
 const LoginPage: FC = () => {
+    //#region  State
     const [username, setUserName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [loginEnable, setLoginEnable] = useState<boolean>(false)
+    const [clientId, setClientId] = useState<string>()
+    const [redirectUrl, setRedirectUrl] = useState<string>()
+    //#endregion
 
+    //#region  Hook
+    const [search] = useSearchParams();
+    //#endregion
+
+    useEffect(() => {
+        const clientIdInSerach = search.get("clientid");
+        console.log("clientIdInSerach", clientIdInSerach);
+        const redirectUrlInSearch = search.get("redirect_url")
+        console.log("redirect_url", redirectUrlInSearch, search);
+        if (clientIdInSerach) {
+            setClientId(clientIdInSerach)
+        }
+        if (redirectUrlInSearch) {
+            setRedirectUrl(redirectUrlInSearch)
+        }
+    }, [search])
 
     const naviFunc: NavigateFunction = useNavigate();
+
     const loginCommand = useCallback(() => {
-        console.log(username, password);
-    }, [username, password])
+        if (username == "test" && password == "1234") {
+            console.log(clientId, redirectUrl);
+            let manager: UserManager | undefined = undefined;
+            manager = new UserManager({
+                client_id: clientId,
+                redirect_uri: redirectUrl,
+                response_type: "code",
+                authority: "https://localhost:7228",//https://localhost:7228;
+                scope: "openid"
+            })
+            // manager?.({
+            //     extraQueryParams: {
+            //         "userId": "test"
+            //     }
+            // });
+        }
+
+    }, [username, password, clientId, redirectUrl])
 
     const registry = () => { naviFunc("/registry") }
 
@@ -58,7 +96,7 @@ const LoginPage: FC = () => {
                                 </div>
                                 <div className="grid grid-cols-4 gap-x-2 justify-items-center">
                                     <Button className="col-start-2" disabled={!loginEnable} onClick={loginCommand}>登录</Button>
-                                    <Button className="col-start-3" onClick={registry }>注册</Button>
+                                    <Button className="col-start-3" onClick={registry}>注册</Button>
                                 </div>
                             </div>
                         </div>
