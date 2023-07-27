@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +16,7 @@ namespace server;
 
 public class AuthorizeController : Controller
 {
-
+    [Authorize]
     [HttpGet("authorize")]
     public async Task<ActionResult> Authorize([FromServices] IOpenIddictScopeManager scopeManager, [FromServices] UserManager<AppUser> userManager)
     {

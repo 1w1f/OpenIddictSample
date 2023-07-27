@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,16 @@ builder.Services.AddHostedService<ClientHostService>();
 
 #region identity
 
-builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>()
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.User.AllowedUserNameCharacters=string.Empty;
+    options.Password.RequiredLength=6;
+    options.Password.RequireUppercase=false;
+    options.Password.RequireLowercase=false;
+    options.Password.RequireNonAlphanumeric=false;
+    options.Password.RequireDigit=false;
+
+}).AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 #endregion
@@ -65,6 +75,10 @@ builder.Services.AddOpenIddict().AddCore(options => { options.UseEntityFramework
 
 #endregion
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.Cookie.Name="AppCookie";
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -79,7 +93,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseCors(p => p.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5555"));
+app.UseCors(p => p.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("https://localhost:5555"));
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

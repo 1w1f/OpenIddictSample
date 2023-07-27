@@ -1,6 +1,9 @@
-import { AxiosRequestConfig } from "axios";
 import AuthServerClient from "./AuthServerClient";
 
-export const login = async (config: AxiosRequestConfig<any> | undefined) => {
-  return await AuthServerClient.get("/login", config);
+export const loginApi = async (config: loginVo | undefined = undefined) => {
+  return await AuthServerClient({
+    method: "post",
+    url: "/User/login",
+    data: config,
+  });
 };

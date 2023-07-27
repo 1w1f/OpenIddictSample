@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { UserManager } from "oidc-client";
+import { loginApi } from "../http/userApi";
 
 const LoginPage: FC = () => {
   //#region  State
@@ -35,8 +36,28 @@ const LoginPage: FC = () => {
 
   const naviFunc: NavigateFunction = useNavigate();
 
-  const loginCommand = useCallback(() => {
-    console.log();
+  const loginCommand = useCallback(async () => {
+    console.log(username, password);
+    const vo: loginVo = {
+      userName: username,
+      password,
+    };
+    const response = await loginApi(vo);
+    if (response.status == 200) {
+      console.log(response);
+      const manager = new UserManager({
+        client_id: clientId,
+        // redirect_uri: redirectUrl,
+        response_type: "code",
+        authority: "https://localhost:7228", //https://localhost:7228;
+        scope: "openid",
+      });
+      manager?.signinRedirect({
+        extraQueryParams: {
+          userId: "test",
+        },
+      });
+    }
   }, [username, password]);
 
   //   const loginCommand = useCallback(() => {
