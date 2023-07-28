@@ -5,8 +5,18 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { UserManager } from "oidc-client";
+import {
+  UserManager,
+  OidcClient,
+  WebStorageStateStore,
+  OidcClientSettings,
+} from "oidc-client";
 import { loginApi } from "../http/userApi";
+import axios from "axios";
+import AuthServerClient from "../http/AuthServerClient";
+import { url } from "inspector";
+
+type Nullable<T> = T | null;
 
 const LoginPage: FC = () => {
   //#region  State
@@ -43,19 +53,38 @@ const LoginPage: FC = () => {
       password,
     };
     const response = await loginApi(vo);
+    console.log(response);
     if (response.status == 200) {
-      console.log(response);
-      const manager = new UserManager({
+      // let client: Nullable<OidcClient> = null;
+      // const setting: OidcClientSettings = {
+      //   client_id: clientId,
+      //   redirect_uri: redirectUrl,
+      //   response_type: "code",
+      //   authority: "https://localhost:7228",
+      //   scope: "openid",
+      // };
+      // client = new OidcClient(setting);
+      // const signInRequest = await client.createSigninRequest();
+      // console.log(signInRequest.url);
+      let manager: UserManager | undefined = undefined;
+      manager = new UserManager({
         client_id: clientId,
-        // redirect_uri: redirectUrl,
+        redirect_uri: redirectUrl,
         response_type: "code",
         authority: "https://localhost:7228", //https://localhost:7228;
         scope: "openid",
       });
-      manager?.signinRedirect({
-        extraQueryParams: {
-          userId: "test",
+      const request = await manager.createSigninRequest();
+      // const response = await AuthServerClient.get(request.url);
+
+      fetch(request.url, {
+        method: "Get",
+        headers: {
+          "Content-Type": "application/json",
         },
+      }).then(function (response) {
+        const location = response.url;
+        window.location.href = location!;
       });
     }
   }, [username, password]);

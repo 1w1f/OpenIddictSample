@@ -16,27 +16,25 @@ namespace server;
 
 public class AuthorizeController : Controller
 {
-    [Authorize]
     [HttpGet("authorize")]
     public async Task<ActionResult> Authorize([FromServices] IOpenIddictScopeManager scopeManager, [FromServices] UserManager<AppUser> userManager)
     {
 
         var request = this.HttpContext.GetOpenIddictServerRequest();
 
-        var identifier = request["userId"];
 
         var users = userManager.Users;
 
-        if (identifier != "test")
-        {
-            return Challenge(
-                authenticationSchemes: new[] { OpenIddictServerAspNetCoreDefaults.AuthenticationScheme },
-                properties: new AuthenticationProperties(new Dictionary<string, string>
-                {
-                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
-                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The specified identity is invalid."
-                }));
-        }
+        //if (identifier != "test")
+        //{
+        //    return Challenge(
+        //        authenticationSchemes: new[] { OpenIddictServerAspNetCoreDefaults.AuthenticationScheme },
+        //        properties: new AuthenticationProperties(new Dictionary<string, string>
+        //        {
+        //            [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
+        //            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The specified identity is invalid."
+        //        }));
+        //}
 
         // Create the claims-based identity that will be used by OpenIddict to generate tokens.
         var identity = new ClaimsIdentity(
@@ -45,7 +43,7 @@ public class AuthorizeController : Controller
             roleType: Claims.Role);
 
         // Add the claims that will be persisted in the tokens.
-        identity.AddClaim(new Claim(Claims.Subject, identifier.Value.ToString()));
+        identity.AddClaim(new Claim(Claims.Subject, "1"));
         identity.AddClaim(new Claim(Claims.Name, "test"));
 
         // Note: in this sample, the client is granted all the requested scopes for the first identity (Alice)
